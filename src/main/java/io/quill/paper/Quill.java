@@ -2,6 +2,7 @@ package io.quill.paper;
 
 import com.google.common.collect.Lists;
 import io.quill.paper.event.EventManager;
+import io.quill.paper.event.bukkit.ArmorEquipEventListener;
 import io.quill.paper.menu.MenuListener;
 import io.quill.paper.menu.MenuManager;
 import io.quill.paper.util.bukkit.Logger;
@@ -26,9 +27,9 @@ public final class Quill {
         EventManager.initialize(plugin);
         MenuManager.initialize();
 
-        instance.bootables.add(
-                new MenuListener()
-        );
+        instance.bootables.add(new MenuListener());
+        instance.bootables.add(new ArmorEquipEventListener());
+
         instance.bootables.addAll(List.of(extra));
 
         for (Bootable b : instance.bootables) {
