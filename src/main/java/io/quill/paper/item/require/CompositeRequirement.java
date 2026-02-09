@@ -1,12 +1,8 @@
 package io.quill.paper.item.require;
 
-import com.google.common.collect.ImmutableMap;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.concurrent.Immutable;
-
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,17 +37,17 @@ final class CompositeRequirement implements InventoryRequirement {
     }
 
     private ConsumeResult consumeAnd(PlayerInventory inventory) {
-        Map<Integer, ItemStack> snapshot = captureSnapshot(inventory);
+        InventorySnapshot snapshot = InventorySnapshot.capture(inventory);
 
         ConsumeResult leftResult = left.tryConsume(inventory);
         if (!leftResult.isSuccess()) {
-            restoreSnapshot(inventory, snapshot);
+            snapshot.restore(inventory);
             return ConsumeResult.failure("Left requirement consume failed: " + leftResult.reason());
         }
 
         ConsumeResult rightResult = right.tryConsume(inventory);
         if (!rightResult.isSuccess()) {
-            restoreSnapshot(inventory, snapshot);
+            snapshot.restore(inventory);
             return ConsumeResult.failure("Right requirement consume failed: " + rightResult.reason());
         }
 
@@ -63,35 +59,6 @@ final class CompositeRequirement implements InventoryRequirement {
             return left.tryConsume(inventory);
         }
 
-        if (right.test(inventory)) {
-            return right.tryConsume(inventory);
-        }
-
-        return ConsumeResult.failure("Neither requirement can be consumed");
-    }
-
-    private Map<Integer, ItemStack> captureSnapshot(PlayerInventory inventory) {
-        ImmutableMap.Builder<Integer, ItemStack> builder = ImmutableMap.builder();
-        ItemStack[] contents = inventory.getStorageContents();
-
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack stack = contents[i];
-            if (stack != null) {
-                builder.put(i, stack.clone());
-            }
-        }
-
-        return builder.build();
-    }
-
-    private void restoreSnapshot(PlayerInventory inventory, Map<Integer, ItemStack> snapshot) {
-        ItemStack[] contents = inventory.getStorageContents();
-
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack restored = snapshot.get(i);
-            contents[i] = restored != null ? restored.clone() : null;
-        }
-
-        inventory.setStorageContents(contents);
+        return right.tryConsume(inventory);
     }
 }

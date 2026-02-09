@@ -23,16 +23,12 @@ final class AnyRequirement implements InventoryRequirement {
 
     @Override
     public ConsumeResult tryConsume(PlayerInventory inventory) {
-        if (!test(inventory)) {
-            return ConsumeResult.failure("No requirement satisfied");
-        }
-
         for (InventoryRequirement requirement : requirements) {
             if (requirement.test(inventory)) {
                 return requirement.tryConsume(inventory);
             }
         }
 
-        return ConsumeResult.failure("No requirement can be consumed");
+        return ConsumeResult.failure("No requirement satisfied");
     }
 }

@@ -20,18 +20,10 @@ final class ItemRequirement implements InventoryRequirement {
         this.amount = amount;
     }
 
-    /**
-     * ItemStack 기반 요구사항 생성
-     * NBT, enchantment, durability 등 모든 메타데이터를 비교한다
-     */
     static ItemRequirement of(ItemStack item, int amount) {
         return new ItemRequirement(item.clone(), amount);
     }
 
-    /**
-     * Material 기반 요구사항 생성
-     * 메타데이터는 비교하지 않고 Material만 일치하면 된다
-     */
     static ItemRequirement of(Material material, int amount) {
         return new ItemRequirement(new ItemStack(material), amount);
     }
@@ -44,15 +36,15 @@ final class ItemRequirement implements InventoryRequirement {
     @Override
     public ConsumeResult tryConsume(PlayerInventory inventory) {
         if (!test(inventory)) {
-            return ConsumeResult.failure(
-                    String.format("Insufficient items: need %d, have %d", amount, countMatching(inventory))
-            );
+            return ConsumeResult.failure(String.format("Insufficient items: need %d, have %d", amount, countMatching(inventory)));
         }
+
+        InventorySnapshot snapshot = InventorySnapshot.capture(inventory);
 
         int remaining = amount;
         ItemStack[] contents = inventory.getStorageContents();
 
-        for (int i = 0; i < contents.length; i++) {
+        for (int i = 0; i < contents.length && remaining > 0; i++) {
             ItemStack stack = contents[i];
             if (stack == null || !stack.isSimilar(template)) {
                 continue;
@@ -61,15 +53,14 @@ final class ItemRequirement implements InventoryRequirement {
             int toRemove = Math.min(stack.getAmount(), remaining);
             stack.setAmount(stack.getAmount() - toRemove);
             remaining -= toRemove;
-
-            if (remaining <= 0) {
-                return ConsumeResult.success();
-            }
         }
 
-        return remaining <= 0
-                ? ConsumeResult.success()
-                : ConsumeResult.failure("Failed to consume items");
+        if (remaining > 0) {
+            snapshot.restore(inventory);
+            return ConsumeResult.failure("Failed to consume items");
+        }
+
+        return ConsumeResult.success();
     }
 
     private int countMatching(PlayerInventory inventory) {

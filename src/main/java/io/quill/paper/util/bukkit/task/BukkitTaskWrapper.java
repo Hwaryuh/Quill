@@ -4,20 +4,22 @@ import org.bukkit.scheduler.BukkitTask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-final class QuillScheduledTask implements ScheduledTask {
+/**
+ * BukkitTask를 CancellableTask 인터페이스로 래핑한 구현체.
+ */
+final class BukkitTaskWrapper implements BukkitBackedTask {
     private final BukkitTask task;
     private final boolean repeating;
 
-    QuillScheduledTask(BukkitTask task, boolean repeating) {
+    BukkitTaskWrapper(BukkitTask task, boolean repeating) {
         this.task = checkNotNull(task, "task");
         this.repeating = repeating;
     }
 
     @Override
     public boolean cancel() {
-        if (task.isCancelled()) {
-            return false;
-        }
+        if (task.isCancelled()) return false;
+
         task.cancel();
         return true;
     }

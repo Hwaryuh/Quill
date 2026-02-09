@@ -60,27 +60,27 @@ public interface EventSubscriber<T extends Event, C extends EventContext> {
 
     /**
      * 이 구독자의 실행 우선순위를 반환합니다.
-     * {@link Listen} 어노테이션보다 우선순위가 높습니다.
+     * {@link Subscriber} 어노테이션보다 우선순위가 높습니다.
      * 명시적 Override는 설정을 덮어씁니다.
      *
      * @return Bukkit 이벤트 우선순위
-     * @see Listen#priority()
+     * @see Subscriber#priority()
      */
     default EventPriority getPriority() {
-        Listen config = this.getClass().getAnnotation(Listen.class);
+        Subscriber config = this.getClass().getAnnotation(Subscriber.class);
         return config != null ? config.priority() : EventPriority.NORMAL;
     }
 
     /**
      * 취소된 이벤트를 무시할지 여부를 반환합니다.
-     * {@link Listen} 어노테이션보다 우선순위가 높습니다.
+     * {@link Subscriber} 어노테이션보다 우선순위가 높습니다.
      * 명시적 Override는 설정을 덮어씁니다.
      *
      * @return 취소된 이벤트 무시 여부
-     * @see Listen#ignoreCancelled()
+     * @see Subscriber#ignoreCancelled()
      */
     default boolean ignoreCancelled() {
-        Listen config = this.getClass().getAnnotation(Listen.class);
+        Subscriber config = this.getClass().getAnnotation(Subscriber.class);
         return config != null && config.ignoreCancelled();
     }
 }

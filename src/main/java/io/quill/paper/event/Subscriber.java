@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Listen {
+public @interface Subscriber {
     EventPriority priority() default EventPriority.NORMAL;
     boolean ignoreCancelled() default false;
 }
