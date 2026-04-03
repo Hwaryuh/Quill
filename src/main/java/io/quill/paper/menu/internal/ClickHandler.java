@@ -4,14 +4,11 @@ import io.quill.paper.menu.button.ClickContext;
 import io.quill.paper.menu.button.DynamicButton;
 import io.quill.paper.menu.button.InventoryButton;
 import io.quill.paper.menu.slot.ShiftClickRouter;
-import io.quill.paper.util.bukkit.Logger;
 import io.quill.paper.util.bukkit.task.Tasks;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
 
 public class ClickHandler {
     private final ButtonRegistry registry;
@@ -55,7 +52,7 @@ public class ClickHandler {
                             return;
                         }
 
-                        event.setCancelled(true);
+                        event.setCancelled(true); // <-- 항상 실행됨 (routeToSlots 성공/실패 무관)
                         return;
                     }
                 }
@@ -80,32 +77,16 @@ public class ClickHandler {
     }
 
     private boolean tryRouteToSlots(ItemStack item, int[] slots) {
-        Logger.info("=== tryRouteToSlots 시작 ===");
-        Logger.info("아이템: " + item.getType() + " x" + item.getAmount());
-        Logger.info("대상 슬롯들: " + Arrays.toString(slots));
-
         for (int slot : slots) {
-            Logger.info("슬롯 " + slot + " 처리 중... 남은 수량: " + item.getAmount());
-
-            ItemStack currentSlotItem = registry.buttons.getInventory().getItem(slot);
-            Logger.info("  -> 슬롯 내용: " + (currentSlotItem != null ? currentSlotItem.getType() + " x" + currentSlotItem.getAmount() : "empty"));
-
             InventoryButton button = registry.buttons.getButton(slot);
-            Logger.info("  -> 버튼 타입: " + (button != null ? button.getClass().getSimpleName() : "null"));
-
             if (button instanceof AdvancedSlotFilterButton filterButton) {
-                Logger.info("  -> AdvancedSlotFilterButton 발견");
                 boolean result = filterButton.getFilter().handleShiftClick(item, registry.buttons.getInventory(), slot);
-                Logger.info("  -> handleShiftClick 결과: " + result + ", 남은 수량: " + item.getAmount());
-
                 if (result) {
-                    Logger.info("  -> 성공! 즉시 종료");
                     return true;
                 }
             }
         }
 
-        Logger.info("=== tryRouteToSlots 종료: 모두 실패, 최종 수량=" + item.getAmount() + " ===");
         return false;
     }
 }

@@ -73,8 +73,9 @@ public class ButtonManager {
         buttons.put(slot, new AdvancedSlotFilterButton(filter, inventory));
     }
 
-    public void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, Integer maxAmount) {
+    public void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, Integer maxAmount, Runnable onPlaced) {
         PlaceholderSlot placeholderSlot = new PlaceholderSlot(placeholder, itemFilter, inventory, slot, maxAmount);
+        if (onPlaced != null) placeholderSlot.onPlaced(onPlaced);
         buttons.put(slot, new AdvancedSlotFilterButton(placeholderSlot, inventory));
         placeholderSlot.showPlaceholder();
     }

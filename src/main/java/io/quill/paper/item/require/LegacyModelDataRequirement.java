@@ -1,31 +1,22 @@
 package io.quill.paper.item.require;
 
+import javax.annotation.concurrent.Immutable;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import javax.annotation.concurrent.Immutable;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @Immutable
-final class ItemRequirement implements InventoryRequirement {
-    private final ItemStack template;
+final class LegacyModelDataRequirement implements InventoryRequirement {
+    private final Material material;
+    private final int customModelData;
     private final int amount;
 
-    private ItemRequirement(ItemStack template, int amount) {
-        this.template = checkNotNull(template, "template");
-        checkArgument(amount > 0, "amount must be positive: %s", amount);
+    LegacyModelDataRequirement(Material material, int customModelData, int amount) {
+        this.material = material;
+        this.customModelData = customModelData;
         this.amount = amount;
-    }
-
-    static ItemRequirement of(ItemStack item, int amount) {
-        return new ItemRequirement(item.clone(), amount);
-    }
-
-    static ItemRequirement of(Material material, int amount) {
-        return new ItemRequirement(ItemStack.of(material), amount);
     }
 
     @Override
@@ -36,7 +27,7 @@ final class ItemRequirement implements InventoryRequirement {
     @Override
     public ConsumeResult tryConsume(PlayerInventory inventory) {
         if (!test(inventory)) {
-            return ConsumeResult.failure(String.format("Insufficient items: need %d, have %d", amount, countMatching(inventory)));
+            return ConsumeResult.failure("Insufficient items");
         }
 
         InventorySnapshot snapshot = InventorySnapshot.capture(inventory);
@@ -46,9 +37,7 @@ final class ItemRequirement implements InventoryRequirement {
 
         for (int i = 0; i < contents.length && remaining > 0; i++) {
             ItemStack stack = contents[i];
-            if (stack == null || !stack.isSimilar(template)) {
-                continue;
-            }
+            if (!matches(stack)) continue;
 
             int toRemove = Math.min(stack.getAmount(), remaining);
             stack.setAmount(stack.getAmount() - toRemove);
@@ -63,10 +52,17 @@ final class ItemRequirement implements InventoryRequirement {
         return ConsumeResult.success();
     }
 
+    private boolean matches(ItemStack stack) {
+        if (stack == null || stack.getType() != material) return false;
+
+        ItemMeta meta = stack.getItemMeta();
+        return meta != null && meta.hasCustomModelData() && meta.getCustomModelData() == customModelData;
+    }
+
     private int countMatching(PlayerInventory inventory) {
         int count = 0;
         for (ItemStack stack : inventory.getStorageContents()) {
-            if (stack != null && stack.isSimilar(template)) {
+            if (matches(stack)) {
                 count += stack.getAmount();
             }
         }

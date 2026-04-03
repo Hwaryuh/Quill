@@ -1,6 +1,6 @@
 package io.quill.paper.command;
 
 @FunctionalInterface
-public interface CommandRunner {
-    CommandResult run(ExecutionContext ctx);
+public interface CommandRunner<S extends SenderContext> {
+    CommandResult run(ExecutionContext<S> ctx);
 }

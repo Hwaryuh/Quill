@@ -16,4 +16,9 @@ public final class ItemMatcher {
 
         return itemCmd != null && itemCmd.equals(templateCmd);
     }
+
+    public static boolean matchesMaterial(ItemStack item, ItemStack template) {
+        if (item == null || template == null) return false;
+        return item.getType() == template.getType();
+    }
 }

@@ -1,6 +1,5 @@
 package io.quill.paper.event.registry;
 
-import io.quill.paper.Quill;
 import io.quill.paper.event.EventContext;
 import io.quill.paper.event.EventSubscriber;
 import org.bukkit.event.Event;
@@ -14,24 +13,22 @@ import java.util.List;
 import java.util.Map;
 
 public class LiveEventPipeline<T extends Event, C extends EventContext> {
-    private JavaPlugin getPlugin() {
-        return Quill.getInstance().getPlugin();
-    }
-
+    private final JavaPlugin plugin;
     private final Class<T> eventType;
     private final Map<EventSubscriber<T, C>, Listener> subscribers = new IdentityHashMap<>(4);
 
-    public LiveEventPipeline(Class<T> eventType) {
+    public LiveEventPipeline(JavaPlugin plugin, Class<T> eventType) {
+        this.plugin = plugin;
         this.eventType = eventType;
     }
 
     public void enable(EventSubscriber<T, C> subscriber) {
         if (subscribers.containsKey(subscriber)) return;
 
-        Listener listener = new Listener() {};
+        Listener listener = new Listener() { };
         EventExecutor executor = EventExecutors.create(eventType, List.of(subscriber));
 
-        getPlugin().getServer().getPluginManager().registerEvent(eventType, listener, subscriber.getPriority(), executor, getPlugin(), subscriber.ignoreCancelled());
+        plugin.getServer().getPluginManager().registerEvent(eventType, listener, subscriber.getPriority(), executor, plugin, subscriber.ignoreCancelled());
         subscribers.put(subscriber, listener);
     }
 

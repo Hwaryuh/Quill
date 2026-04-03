@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import io.quill.paper.command.ArgumentKey;
 import io.quill.paper.command.CommandRunner;
 import io.quill.paper.command.DynamicSuggestions;
+import io.quill.paper.command.SenderContext;
 import io.quill.paper.command.argument.ArgumentRequirement;
 import io.quill.paper.command.argument.ArgumentSpec;
 import io.quill.paper.command.argument.ArgType;
@@ -17,7 +18,7 @@ public final class QuillCommandBuilder {
     private String permission;
     private SenderType senderType = SenderType.ANY;
     private final List<ArgumentSpec<?>> arguments = Lists.newArrayList();
-    private CommandRunner runner;
+    private CommandRunner<?> runner;
     private final List<QuillCommand> children = Lists.newArrayList();
 
     public enum SenderType { ANY, PLAYER, CONSOLE}
@@ -51,7 +52,15 @@ public final class QuillCommandBuilder {
         return new ArgumentBuilder<>(this, key, type);
     }
 
-    public QuillCommandBuilder run(CommandRunner runner) {
+    public QuillCommandBuilder run(CommandRunner<SenderContext.AnySender> runner) {
+        this.runner = runner;
+        return this;
+    }
+
+    public QuillCommandBuilder runPlayer(CommandRunner<SenderContext.PlayerOnly> runner) {
+        if (this.senderType != SenderType.PLAYER) {
+            throw new IllegalStateException("runPlayer can only be used with playerOnly()");
+        }
         this.runner = runner;
         return this;
     }

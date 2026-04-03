@@ -12,7 +12,7 @@ public record QuillCommand(
         String permission,
         SenderType senderType,
         List<ArgumentSpec<?>> arguments,
-        CommandRunner runner,
+        CommandRunner<?> runner,
         List<QuillCommand> children
 ) {
 

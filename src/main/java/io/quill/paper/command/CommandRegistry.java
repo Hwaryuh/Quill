@@ -87,6 +87,7 @@ public final class CommandRegistry {
         builder.then(argBuilder);
     }
 
+    @SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
     private int run(CommandContext<CommandSourceStack> ctx, QuillCommand node, List<ArgumentSpec<?>> availableArgs) {
         try {
             SenderContext senderCtx = createSenderContext(ctx.getSource(), node.senderType());
@@ -99,14 +100,13 @@ public final class CommandRegistry {
             for (int i = availableArgs.size(); i < node.arguments().size(); i++) {
                 ArgumentSpec<?> spec = node.arguments().get(i);
                 if (spec.isOptional()) {
-                    @SuppressWarnings("unchecked")
-                    ArgumentKey<Object> key = (ArgumentKey<Object>) spec.key();
-                    argsBuilder.put(key, spec.defaultValue());
+                    argsBuilder.put((ArgumentKey<Object>) spec.key(), spec.defaultValue());
                 }
             }
 
-            ExecutionContext execCtx = ExecutionContextImpl.create(ctx, senderCtx, argsBuilder.build());
-            CommandResult result = node.runner().run(execCtx);
+            ExecutionContext<?> execCtx = ExecutionContextImpl.create(ctx, senderCtx, argsBuilder.build());
+            CommandRunner<SenderContext> runner = (CommandRunner<SenderContext>) node.runner();
+            CommandResult result = runner.run((ExecutionContext<SenderContext>) execCtx);
 
             if (result instanceof CommandResult.Failure(String message)) {
                 ctx.getSource().getSender().sendMessage(Component.text(message, NamedTextColor.RED));

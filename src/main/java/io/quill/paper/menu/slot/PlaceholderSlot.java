@@ -13,6 +13,7 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
     private final Inventory inventory;
     private final int slot;
     private final Integer maxAmount;
+    private Runnable onPlaced;
 
     public PlaceholderSlot(ItemStack placeholder, Predicate<ItemStack> itemFilter, Inventory inventory, int slot, Integer maxAmount) {
         this.placeholder = placeholder;
@@ -31,13 +32,18 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
 
         if (!hasPlaceholder && slotItem != null && !slotItem.getType().isAir()) {
             if (mergeStack(slotItem, item)) {
+                fireOnPlaced();
                 return PlaceResult.HANDLED;
             }
             return PlaceResult.DENY;
         }
 
         PlacementResult result = placeItemInSlot(item, slotItem, inventory, slot);
-        return result.success ? PlaceResult.HANDLED : PlaceResult.DENY;
+        if (result.success) {
+            fireOnPlaced();
+            return PlaceResult.HANDLED;
+        }
+        return PlaceResult.DENY;
     }
 
     @Override
@@ -55,10 +61,15 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
         ItemStack slotItem = targetInventory.getItem(slot);
 
         if (slotItem != null && !slotItem.getType().isAir() && !isPlaceholder(slotItem)) {
-            return mergeStack(slotItem, clicked);
+            if (mergeStack(slotItem, clicked)) {
+                fireOnPlaced();
+                return true;
+            }
+            return false;
         }
 
         PlacementResult result = placeItemInSlot(clicked, slotItem, targetInventory, slot);
+        if (result.success) fireOnPlaced();
         return result.success;
     }
 
@@ -110,6 +121,15 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
         if (isPlaceholder(current)) {
             inventory.setItem(slot, ItemStack.empty());
         }
+    }
+
+    public PlaceholderSlot onPlaced(Runnable callback) {
+        this.onPlaced = callback;
+        return this;
+    }
+
+    private void fireOnPlaced() {
+        if (onPlaced != null) onPlaced.run();
     }
 
     private record PlacementResult(boolean success, int placed) { }

@@ -5,8 +5,8 @@ import io.quill.paper.event.EventManager;
 import io.quill.paper.event.bukkit.ArmorEquipEventListener;
 import io.quill.paper.menu.MenuListener;
 import io.quill.paper.menu.MenuManager;
+import io.quill.paper.player.PlayerContextManager;
 import io.quill.paper.util.bukkit.Logger;
-import io.quill.paper.util.bukkit.task.Tasks;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -27,6 +27,7 @@ public final class Quill {
         EventManager.initialize(plugin);
         MenuManager.initialize();
 
+        instance.bootables.add(PlayerContextManager.getInstance());
         instance.bootables.add(new MenuListener());
         instance.bootables.add(new ArmorEquipEventListener());
 

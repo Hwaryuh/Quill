@@ -22,7 +22,6 @@ import java.util.Map;
  * 여러 구독자를 우선순위별로 그룹화하여 실행합니다.
  *
  * @param <T> 처리할 이벤트 타입
- * @param <C> 컨텍스트 타입
  */
 public class StaticEventPipeline<T extends Event> {
     private final Class<T> eventType;

@@ -52,7 +52,7 @@ public final class EventManager {
     public <T extends Event, C extends EventContext> void capture(Class<T> eventType, EventSubscriber<T, C> subscriber) {
         LiveEventPipeline<T, C> registry = (LiveEventPipeline<T, C>) livePipelines.computeIfAbsent(
                 eventType,
-                k -> new LiveEventPipeline<>(eventType)
+                k -> new LiveEventPipeline<>(plugin, eventType)
         );
         registry.enable(subscriber);
     }

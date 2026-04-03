@@ -134,11 +134,15 @@ public abstract class InventoryMenu {
     }
 
     protected void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter) {
-        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, null);
+        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, null, null);
     }
 
     protected void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, int maxAmount) {
-        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount);
+        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount, null);
+    }
+
+    protected void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, int maxAmount, Runnable onPlaced) {
+        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount, onPlaced);
     }
 
     protected void setStatefulSlot(int slot, Supplier<InventoryButton> buttonSupplier) {

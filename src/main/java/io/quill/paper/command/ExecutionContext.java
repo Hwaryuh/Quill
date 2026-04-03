@@ -1,10 +1,8 @@
 package io.quill.paper.command;
 
-public interface ExecutionContext {
-    SenderContext sender();
-
+public interface ExecutionContext<S extends SenderContext> {
+    S sender();
     ArgumentMap arguments();
-
     String fullCommand();
 
     default <T> T arg(ArgumentKey<T> key) {
