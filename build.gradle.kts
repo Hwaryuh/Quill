@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.quill"
-version = "0.2.86"
+version = "0.2.87"
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)

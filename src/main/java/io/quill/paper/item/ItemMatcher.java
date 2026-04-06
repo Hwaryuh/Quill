@@ -1,6 +1,9 @@
 package io.quill.paper.item;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.function.Predicate;
 
 public final class ItemMatcher {
     public static boolean matches(ItemStack item, ItemStack template) {
@@ -20,5 +23,14 @@ public final class ItemMatcher {
     public static boolean matchesMaterial(ItemStack item, ItemStack template) {
         if (item == null || template == null) return false;
         return item.getType() == template.getType();
+    }
+
+    public static Predicate<ItemStack> matcherOf(Material material, int customModelData) {
+        return item -> {
+            if (item == null || item.getType() != material) return false;
+            if (!item.hasItemMeta()) return false;
+            var meta = item.getItemMeta();
+            return meta.hasCustomModelData() && meta.getCustomModelData() == customModelData;
+        };
     }
 }
