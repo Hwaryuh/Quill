@@ -1,7 +1,10 @@
 package io.quill.paper.item;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Ints;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Predicate;
 
@@ -25,12 +28,13 @@ public final class ItemMatcher {
         return item.getType() == template.getType();
     }
 
-    public static Predicate<ItemStack> matcherOf(Material material, int customModelData) {
+    public static Predicate<ItemStack> matcherOf(Material material, int... customModelData) {
+        ImmutableSet<Integer> modelDataSet = ImmutableSet.copyOf(Ints.asList(customModelData));
         return item -> {
             if (item == null || item.getType() != material) return false;
             if (!item.hasItemMeta()) return false;
-            var meta = item.getItemMeta();
-            return meta.hasCustomModelData() && meta.getCustomModelData() == customModelData;
+            ItemMeta meta = item.getItemMeta();
+            return meta.hasCustomModelData() && modelDataSet.contains(meta.getCustomModelData());
         };
     }
 }
