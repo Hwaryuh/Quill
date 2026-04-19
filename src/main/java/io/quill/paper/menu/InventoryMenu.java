@@ -1,5 +1,6 @@
 package io.quill.paper.menu;
 
+import com.google.common.collect.Sets;
 import io.quill.paper.menu.button.ButtonBuilder;
 import io.quill.paper.menu.button.DynamicButton;
 import io.quill.paper.menu.button.InventoryButton;
@@ -184,7 +185,18 @@ public abstract class InventoryMenu {
     }
 
     protected void returnAllInputSlots() {
+        returnAllInputSlotsExcept();
+    }
+
+    protected void returnAllInputSlotsExcept(int... excludeSlots) {
+        Set<Integer> excluded = Sets.newHashSet(excludeSlots.length);
+        for (int slot : excludeSlots) {
+            excluded.add(slot);
+        }
+
         for (int slot : buttons.inputSlots.getInputSlots()) {
+            if (excluded.contains(slot)) continue;
+
             ItemStack item = getInventory().getItem(slot);
             if (item != null && !item.getType().isAir()) {
                 InventoryButton button = buttons.buttons.getButton(slot);
