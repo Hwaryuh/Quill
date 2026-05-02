@@ -74,8 +74,20 @@ public class ButtonManager {
     }
 
     public void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, Integer maxAmount, Runnable onPlaced) {
+        setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount, onPlaced, null);
+    }
+
+    public void setPlaceholderSlot(
+            int slot,
+            ItemStack placeholder,
+            Predicate<ItemStack> itemFilter,
+            Integer maxAmount,
+            Runnable onPlaced,
+            Runnable onPickup
+    ) {
         PlaceholderSlot placeholderSlot = new PlaceholderSlot(placeholder, itemFilter, inventory, slot, maxAmount);
         if (onPlaced != null) placeholderSlot.onPlaced(onPlaced);
+        if (onPickup != null) placeholderSlot.onPickup(onPickup);
         buttons.put(slot, new AdvancedSlotFilterButton(placeholderSlot, inventory));
         placeholderSlot.showPlaceholder();
     }

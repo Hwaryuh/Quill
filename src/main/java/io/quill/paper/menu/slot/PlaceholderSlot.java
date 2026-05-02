@@ -14,6 +14,7 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
     private final int slot;
     private final Integer maxAmount;
     private Runnable onPlaced;
+    private Runnable onPickup;
 
     public PlaceholderSlot(ItemStack placeholder, Predicate<ItemStack> itemFilter, Inventory inventory, int slot, Integer maxAmount) {
         this.placeholder = placeholder;
@@ -51,6 +52,7 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
         if (isPlaceholder(item)) {
             return PickupResult.DENY;
         }
+        fireOnPickup();
         return PickupResult.ALLOW;
     }
 
@@ -128,8 +130,17 @@ public class PlaceholderSlot implements AdvancedSlotFilter {
         return this;
     }
 
+    public PlaceholderSlot onPickup(Runnable callback) {
+        this.onPickup = callback;
+        return this;
+    }
+
     private void fireOnPlaced() {
         if (onPlaced != null) onPlaced.run();
+    }
+
+    private void fireOnPickup() {
+        if (onPickup != null) onPickup.run();
     }
 
     private record PlacementResult(boolean success, int placed) { }

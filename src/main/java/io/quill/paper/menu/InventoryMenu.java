@@ -146,6 +146,10 @@ public abstract class InventoryMenu {
         buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount, onPlaced);
     }
 
+    protected void setPlaceholderSlot(int slot, ItemStack placeholder, Predicate<ItemStack> itemFilter, int maxAmount, Runnable onPlaced, Runnable onPickup) {
+        buttons.buttons.setPlaceholderSlot(slot, placeholder, itemFilter, maxAmount, onPlaced, onPickup);
+    }
+
     protected void setStatefulSlot(int slot, Supplier<InventoryButton> buttonSupplier) {
         buttons.buttons.setStatefulSlot(slot, buttonSupplier);
     }
